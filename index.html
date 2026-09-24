@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>丙午中秋 · 云台三谜</title>
+<style>
+:root{--bg:#eee7d9;--paper:#fbf5e9;--ink:#292621;--muted:#746b5e;--line:#d7c8ae;--gold:#9a7040;--dark:#26302f}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Serif SC","Songti SC","STSong",serif}
+main{width:min(760px,calc(100% - 24px));margin:18px auto 42px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.cover{position:relative;min-height:310px;background:var(--dark) url("images/cover.jpg") center/cover no-repeat;color:#f8f0df;padding:32px}
+.cover:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(12,17,17,.66),rgba(12,17,17,.08))}
+.coverText{position:relative;z-index:1;max-width:520px}.eyebrow{font-size:13px;letter-spacing:.32em;color:#ddc79f}h1{font-size:31px;letter-spacing:.13em;margin:14px 0}
+.cover p{line-height:1.9;color:#e5ddce}.progress{display:flex;gap:8px;margin-top:22px}.lamp{height:9px;width:35px;border-radius:20px;background:#80796e}.lamp.on{background:#d3a861}
+.card{margin-top:16px;padding:24px}.top{display:flex;justify-content:space-between;gap:12px}.label{font-weight:700;letter-spacing:.15em}.count{color:var(--muted);font-size:13px}
+.visual{aspect-ratio:16/9;margin:20px 0;border-radius:14px;background-position:center;background-size:cover;border:1px solid var(--line)}
+.poem{text-align:center;font-size:20px;line-height:2.05;letter-spacing:.1em;margin:20px 0}.prompt{text-align:center;color:var(--muted);font-size:14px}
+form{max-width:440px;margin:20px auto 0}input{width:100%;padding:13px;border-radius:11px;border:1px solid var(--line);background:#fffdf8;text-align:center;font:inherit;font-size:16px}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:12px}button{min-height:44px;padding:10px 19px;border-radius:11px;border:1px solid var(--line);background:#fffdf8;color:var(--ink);font:inherit;cursor:pointer}.primary{background:var(--gold);border-color:var(--gold);color:white}
+.feedback{max-width:440px;margin:16px auto 0;padding:13px;border:1px solid var(--line);border-radius:11px;background:#fffdf8;text-align:center;line-height:1.7}.next{text-align:center;margin-top:14px}.hidden{display:none}
+.finish{margin-top:16px;text-align:center;padding-bottom:30px}.finishVisual{height:240px;background:url("images/ending.jpg") center/cover no-repeat}.finishText{padding:26px}.finish h2{letter-spacing:.13em}.finish p{color:var(--muted);line-height:1.9;max-width:520px;margin:12px auto}
+.note{margin-top:15px;color:var(--muted);font-size:12px;line-height:1.7;text-align:center}
+@media(max-width:520px){.cover{padding:24px;min-height:285px}h1{font-size:25px}.card{padding:20px 16px}.poem{font-size:18px}.visual{aspect-ratio:16/9}}
+</style>
+</head>
+<body>
+<main id="app">
+<section class="panel cover">
+ <div class="coverText"><div class="eyebrow">丙午中秋 · 云台三谜</div><h1>云台月满 · 灯下寻谜</h1>
+ <p>三件旧物，三段往事。今夜不论江湖胜负，只问你是否还记得云襄走过的那个江湖。</p>
+ <div class="progress"><span class="lamp on"></span><span class="lamp"></span><span class="lamp"></span></div></div>
+</section>
+
+<section class="panel card" id="questionCard">
+ <div class="top"><div id="qLabel" class="label"></div><div id="counter" class="count"></div></div>
+ <div id="visual" class="visual"></div>
+ <div id="poem" class="poem"></div>
+ <div class="prompt">打一《云襄传》中之物</div>
+ <form id="answerForm"><input id="answer" autocomplete="off" placeholder="在此写下谜底" aria-label="输入谜底">
+ <div class="actions"><button class="primary" type="submit">揭谜</button><button id="hintBtn" type="button">给我一点提示</button><button id="revealBtn" type="button">猜不出 · 看谜底</button></div></form>
+ <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+ <div class="next"><button id="nextBtn" type="button" class="hidden">下一谜 →</button></div>
+</section>
+
+<section id="finish" class="panel finish hidden">
+ <div class="finishVisual"></div><div class="finishText"><div class="eyebrow" style="color:var(--gold)">三谜皆解 · 月满云台</div>
+ <h2>恭喜通关</h2><p>扳指藏旧事，契票定商局，糖葫芦留一味人间烟火。旧日江湖仍在故事里，愿今夜与你，再赴云襄一程。</p>
+ <strong>中秋快乐 · 月满人安</strong><br><button id="restartBtn" class="primary" type="button" style="margin-top:20px">再猜一次</button></div>
+</section>
+<div class="note">图片均可自行替换：保持文件名不变，直接覆盖 images 文件夹中的同名文件即可。</div>
+</main>
+<script>
+(()=>{
+const qs=[
+{label:"第一谜 · 旧事",lines:["环环无声掌中藏，","一朝遗落酒楼旁。","自己从来不会说，","却将故人旧事扬。"],answer:"扳指",aliases:["玉扳指"],hint:"它戴于手上，小小一物，却曾牵出一段旧日身份。",explain:"一枚扳指，牵出云襄旧日身世，也让无声之物成了会说话的线索。",img:"images/riddle-1.jpg"},
+{label:"第二谜 · 入局",lines:["薄薄一纸不见丝，","千担生意系于斯。","货尚未到先论价，","输赢只待局终时。"],answer:"契票",aliases:["生丝契票"],hint:"南都商局里，它不是货，却能代表货；不是银，却能牵动银。",explain:"南都商局之中，一纸契票连接生丝、价格与信用，也是云襄布局的重要一环。",img:"images/riddle-2.jpg"},
+{label:"第三谜 · 小趣",lines:["一串玲珑裹晶霜，","酸甜滋味齿间藏。","莫看公子多谋算，","见了此物也难防。"],answer:"糖葫芦",aliases:["冰糖葫芦"],hint:"这一题不在商局，也不在身世——想想云襄嘴馋的时候。",explain:"算得了江湖局，也抵不过一串酸甜。糖葫芦藏着云襄很可爱的一点人间烟火。",img:"images/riddle-3.jpg"}];
+let i=0, solvedDirect=0, finished=false;
+const $=s=>document.querySelector(s),card=$("#questionCard"),finish=$("#finish"),input=$("#answer"),fb=$("#feedback"),next=$("#nextBtn"),hint=$("#hintBtn"),reveal=$("#revealBtn");
+function norm(s){return s.trim().replace(/[\s，。！？、]/g,"")}
+function unlock(q, direct){
+  if(finished) return;
+  finished=true;
+  if(direct) solvedDirect++;
+  input.disabled=true; hint.disabled=true; reveal.disabled=true;
+  fb.classList.remove("hidden");
+  fb.innerHTML=direct
+    ? "🏮 <strong>答对了！谜底正是「"+q.answer+"」</strong><br>"+q.explain
+    : "🏮 <strong>谜底是「"+q.answer+"」</strong><br>"+q.explain+"<br><span style='color:var(--muted)'>这一盏也为你点亮，继续往前走吧。</span>";
+  next.classList.remove("hidden");
+  next.textContent=i===2?"查看通关签 →":"下一谜 →";
+}
+function render(){
+  finished=false; let q=qs[i];
+  $("#qLabel").textContent=q.label; $("#counter").textContent=(i+1)+" / 3";
+  $("#poem").innerHTML=q.lines.map(x=>"<div>"+x+"</div>").join("");
+  $("#visual").style.backgroundImage='url("'+q.img+'")';
+  input.value=""; input.disabled=false; hint.disabled=false; reveal.disabled=false;
+  fb.classList.add("hidden"); next.classList.add("hidden");
+  document.querySelectorAll(".lamp").forEach((x,n)=>x.classList.toggle("on",n<=i));
+}
+$("#answerForm").addEventListener("submit",e=>{
+  e.preventDefault(); if(finished) return;
+  let q=qs[i],v=norm(input.value);
+  fb.classList.remove("hidden");
+  if(!v){fb.textContent="灯下无字可猜。可以写下答案，也可以看提示或直接揭晓谜底。";return}
+  if([q.answer,...q.aliases].map(norm).includes(v)) unlock(q,true);
+  else fb.innerHTML="还差一点。你可以再猜一次、看看提示，或者直接揭晓谜底继续游戏。";
+});
+hint.addEventListener("click",()=>{
+  if(finished) return;
+  fb.classList.remove("hidden");
+  fb.innerHTML="💡 <strong>云台小提示</strong><br>"+qs[i].hint;
+});
+reveal.addEventListener("click",()=>unlock(qs[i],false));
+next.addEventListener("click",()=>{
+  if(i<2){i++;render()}
+  else{
+    card.classList.add("hidden");finish.classList.remove("hidden");
+    document.querySelectorAll(".lamp").forEach(x=>x.classList.add("on"));
+    const p=finish.querySelector("p");
+    p.innerHTML="扳指藏旧事，契票定商局，糖葫芦留一味人间烟火。<br><strong>你独自解开了 "+solvedDirect+" / 3 道谜。</strong><br>旧日江湖仍在故事里，愿今夜与你，再赴云襄一程。";
+  }
+});
+$("#restartBtn").addEventListener("click",()=>{
+  i=0;solvedDirect=0;finish.classList.add("hidden");card.classList.remove("hidden");render()
+});
+render();
+})();
+</script>
+</body></html>
